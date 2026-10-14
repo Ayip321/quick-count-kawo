@@ -1,63 +1,102 @@
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Quick Count Pilkades Desa Kawo</title>
+<title>Quick Count Pilkades Desa Kawo 2026</title>
 <style>
-body{font-family:Arial,sans-serif;margin:0;background:#f1f5f2;color:#183528}
-header{background:#14532d;color:white;text-align:center;padding:24px 12px}
-h1{font-size:23px;margin:0 0 8px}
-main{max-width:800px;margin:auto;padding:12px}
-.card{background:white;border-radius:12px;padding:15px;margin:12px 0;box-shadow:0 2px 7px #0001}
-.stat{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.stat div{background:#e4f1e7;padding:12px;border-radius:8px}
-.big{font-size:23px;font-weight:bold;margin-top:6px}
-label{display:block;font-size:13px;margin:10px 0 5px}
-input{box-sizing:border-box;width:100%;padding:10px;border:1px solid #ccd8ce;border-radius:7px;font-size:16px}
-button{background:#166534;color:white;border:0;padding:11px;border-radius:8px;font-size:15px;font-weight:bold;cursor:pointer}
+body{font-family:Arial,sans-serif;margin:0;background:#f3f6fb;color:#172033}
+header{background:#124734;color:white;padding:20px 14px}
+main{max-width:950px;margin:auto;padding:12px}
+.card{background:white;padding:14px;border-radius:10px;margin:12px 0}
+input,button{font:inherit;padding:10px;margin:5px 0;border-radius:6px}
+input{width:90%;border:1px solid #bbb}
+button{background:#176b4b;color:white;border:0}
 table{width:100%;border-collapse:collapse}
-th,td{text-align:left;padding:9px 5px;border-bottom:1px solid #ddd;font-size:13px}
-.num{text-align:right}
-small{color:#66756a}
+th,td{text-align:left;border-bottom:1px solid #ddd;padding:8px;font-size:13px}
+.wrap{overflow-x:auto}
+.tps{border:1px solid #ddd;padding:12px;border-radius:8px;margin:12px 0}
+.muted{color:#667085;font-size:13px}
+.status{font-size:13px}
 </style>
 </head>
 <body>
 <header>
-<h1>PERHITUNGAN CEPAT</h1>
-<div>PILKADES DESA KAWO 2026</div>
+<h2>Quick Count Pilkades Desa Kawo 2026</h2>
+<p>Hasil sementara, bukan penetapan hasil resmi.</p>
 </header>
 <main>
-<div class="card">
-<h3>Rekapitulasi Sementara</h3>
-<div class="stat">
-<div>Total DPT<div class="big" id="dpt">8.777</div></div>
-<div>Total Suara Masuk<div class="big" id="masuk">0</div></div>
-<div>TPS Terisi<div class="big" id="terisi">0/18</div></div>
-<div>Partisipasi<div class="big" id="partisipasi">0%</div></div>
-</div>
-</div>
-<div class="card">
+<section class="card">
+<h3>Ringkasan</h3>
+<p>Total suara masuk: <b id="total">0</b></p>
+<p>TPS tersimpan: <b id="saved">0/18</b></p>
+<p>DPT: <b>8.777</b></p>
+<p id="connection">Menghubungkan ke Firebase...</p>
+</section>
+
+<section class="card">
 <h3>Perolehan Suara Calon</h3>
-<table>
-<thead><tr><th>No.</th><th>Nama Calon</th><th class="num">Suara</th><th class="num">%</th></tr></thead>
-<tbody id="hasil"></tbody>
-</table>
-<small>Hasil ini merupakan perhitungan cepat, bukan hasil resmi.</small>
+<div class="wrap"><table>
+<thead><tr><th>No.</th><th>Nama Calon</th><th>Suara</th></tr></thead>
+<tbody id="results"></tbody>
+</table></div>
+</section>
+
+<section class="card">
+<h3>Login Petugas</h3>
+<p class="muted">Warga bisa melihat hasil tanpa login. Hanya petugas berwenang yang dapat memasukkan data.</p>
+<div id="login">
+<input id="email" type="email" placeholder="Email petugas"><br>
+<input id="password" type="password" placeholder="Kata sandi"><br>
+<button id="loginBtn">Login</button>
 </div>
-<div class="card">
-<h3>Input Suara per TPS</h3>
-<p><small>Masukkan jumlah suara sesuai formulir rekapitulasi TPS.</small></p>
-<div id="daftar"></div>
-<button onclick="simpan()" style="width:100%;margin-top:15px">Simpan Data di HP Ini</button>
-<button onclick="resetData()" style="width:100%;margin-top:8px;background:#a52a2a">Reset Semua Data</button>
-<p><small>Versi awal ini menyimpan data di browser HP ini saja, belum dibagikan ke perangkat lain.</small></p>
+<div id="account" hidden>
+<p id="accountText"></p>
+<button id="logoutBtn">Logout</button>
 </div>
+<p id="loginStatus" class="status"></p>
+</section>
+
+<section class="card" id="entry" hidden>
+<h3>Input Hasil TPS</h3>
+<p class="muted">Masukkan angka sesuai rekap TPS. Total suara tidak boleh melebihi DPT TPS.</p>
+<div id="forms"></div>
+</section>
+
+<section class="card">
+<h3>Rekap 18 TPS</h3>
+<div class="wrap"><table>
+<thead><tr><th>TPS</th><th>Lokasi</th><th>DPT</th><th>Tandar</th><th>Ahyar</th><th>Imran</th><th>Ali</th><th>Herman</th><th>Tidak sah</th></tr></thead>
+<tbody id="details"></tbody>
+</table></div>
+</section>
 </main>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script>
-const calon=["Tandar","Ahyar Alimudin","Imran","Ali Husrin","Herman Edy"];
-const tps=[
+/* GANTI NILAI DI BAWAH DENGAN KONFIGURASI FIREBASE ANDA */
+const firebaseConfig = {
+  apiKey: "AIzaSyBGGBvR39edQ96sYDHo87D-9nU_F4dGzHg",
+  authDomain: "hitung-cepat-kawo.firebaseapp.com",
+  databaseURL: "https://hitung-cepat-kawo-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "hitung-cepat-kawo",
+  storageBucket: "hitung-cepat-kawo.firebasestorage.app",
+  messagingSenderId: "267858437486",
+  appId: "1:267858437486:web:b20e2e8cda7acf6139cd7f",
+};
+
+const candidates = [
+  {key:"tandar",name:"Tandar"},
+  {key:"ahyar",name:"Ahyar Alimudin"},
+  {key:"imran",name:"Imran"},
+  {key:"ali",name:"Ali Husrin"},
+  {key:"herman",name:"Herman Edy"}
+];
+
+const tps = [
 ["BUMI GORA",502],["PENGADANG",453],["PENGADANG",407],
 ["BATU BANGKE",541],["BALE MONTONG I",481],["BALE MONTONG I",490],
 ["PANCE",359],["GONJONG",294],["BALE MONTONG II",577],
@@ -66,51 +105,102 @@ const tps=[
 ["GUBUK DIREK",580],["KARANG DAYE",412],["GAMPUNG & WARENG",592],
 ["GILIK",554]
 ];
-let data=tps.map(()=>({v:[0,0,0,0,0],tidak:0}));
-function buatForm(){
-document.getElementById("daftar").innerHTML=tps.map((t,i)=>`
-<div style="border-top:1px solid #ddd;padding:12px 0">
-<strong>TPS ${String(i+1).padStart(3,"0")} - ${t[0]}</strong><br>
-<small>DPT: ${t[1]}</small>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-${calon.map((c,j)=>`<div><label>${j+1}. ${c}</label><input type="number" min="0" step="1" inputmode="numeric" id="v${i}_${j}" value="${data[i].v[j]}"></div>`).join("")}
-<div style="grid-column:1/-1"><label>Suara tidak sah</label><input type="number" min="0" step="1" inputmode="numeric" id="x${i}" value="${data[i].tidak}"></div>
-</div></div>`).join("");
+
+let db, auth, data = {}, user = null;
+const $ = id => document.getElementById(id);
+const n = v => Math.max(0,Math.floor(Number(v)||0));
+const totalRow = r => candidates.reduce((s,c)=>s+n(r[c.key]),0)+n(r.invalid);
+
+function render(){
+ let totals = candidates.map(()=>0), total = 0, saved = 0;
+ tps.forEach((t,i)=>{
+   const r = data[i+1];
+   if(r){
+     saved++;
+     candidates.forEach((c,j)=>totals[j]+=n(r[c.key]));
+     total += totalRow(r);
+   }
+ });
+ $("total").textContent=total.toLocaleString("id-ID");
+ $("saved").textContent=saved+"/18";
+ $("results").innerHTML=candidates.map((c,j)=>
+   `<tr><td>${j+1}</td><td>${c.name}</td><td>${totals[j].toLocaleString("id-ID")}</td></tr>`
+ ).join("");
+ $("details").innerHTML=tps.map((t,i)=>{
+   const r=data[i+1]||{};
+   return `<tr><td>${i+1}</td><td>${t[0]}</td><td>${t[1]}</td>`+
+   candidates.map(c=>`<td>${r[c.key]===undefined?"—":n(r[c.key])}</td>`).join("")+
+   `<td>${r.invalid===undefined?"—":n(r.invalid)}</td></tr>`;
+ }).join("");
+ if(user) renderForms();
 }
-function hitung(){
-let totalDpt=tps.reduce((s,t)=>s+t[1],0),total=0,invalid=0,terisi=0;
-let suara=calon.map(()=>0);
-data.forEach((d,i)=>{
-let jumlah=d.v.reduce((a,b)=>a+b,0)+d.tidak;
-total+=d.v.reduce((a,b)=>a+b,0);invalid+=d.tidak;
-if(jumlah>0)terisi++;
-d.v.forEach((v,j)=>suara[j]+=v);
-});
-document.getElementById("dpt").textContent=totalDpt.toLocaleString("id-ID");
-document.getElementById("masuk").textContent=(total+invalid).toLocaleString("id-ID");
-document.getElementById("terisi").textContent=terisi+"/18";
-document.getElementById("partisipasi").textContent=(100*(total+invalid)/totalDpt).toLocaleString("id-ID",{maximumFractionDigits:1})+"%";
-document.getElementById("hasil").innerHTML=suara.map((v,i)=>({v,i})).sort((a,b)=>b.v-a.v).map(o=>`<tr><td>${o.i+1}</td><td>${calon[o.i]}</td><td class="num">${o.v.toLocaleString("id-ID")}</td><td class="num">${(total?100*o.v/total:0).toFixed(1)}%</td></tr>`).join("")+`<tr><td>-</td><td>Suara tidak sah</td><td class="num">${invalid.toLocaleString("id-ID")}</td><td class="num">-</td></tr>`;
+
+function renderForms(){
+ $("forms").innerHTML=tps.map((t,i)=>{
+   const id=i+1, r=data[id]||{};
+   return `<div class="tps"><h4>TPS ${id} — ${t[0]}</h4><p>DPT: ${t[1]}</p>`+
+   candidates.map(c=>`<label>${c.name}<br><input type="number" min="0" id="v${id}_${c.key}" value="${r[c.key]===undefined?"":n(r[c.key])}" placeholder="Jumlah suara"></label><br>`).join("")+
+   `<label>Suara tidak sah<br><input type="number" min="0" id="v${id}_invalid" value="${r.invalid===undefined?"":n(r.invalid)}" placeholder="Jumlah suara tidak sah"></label><br>`+
+   `<button onclick="saveTps(${id})">Simpan TPS ${id}</button><p id="s${id}" class="status"></p></div>`;
+ }).join("");
 }
-function simpan(){
-let baru=tps.map((t,i)=>({v:calon.map((_,j)=>Number(document.getElementById(`v${i}_${j}`).value)),tidak:Number(document.getElementById(`x${i}`).value)}));
-for(let i=0;i<tps.length;i++){
-let jumlah=baru[i].v.reduce((a,b)=>a+b,0)+baru[i].tidak;
-if([...baru[i].v,baru[i].tidak].some(n=>!Number.isInteger(n)||n<0)||jumlah>tps[i][1]){
-alert("Periksa TPS "+String(i+1).padStart(3,"0")+". Angka harus bulat, tidak negatif, dan total tidak boleh melebihi DPT.");return;
-}}
-data=baru;
-try{localStorage.setItem("kawoQuickCount",JSON.stringify(data));}catch(e){}
-hitung();alert("Data berhasil disimpan di browser HP ini.");
+
+window.saveTps = async function(id){
+ if(!user)return;
+ const row={};
+ candidates.forEach(c=>row[c.key]=n($(`v${id}_${c.key}`).value));
+ row.invalid=n($(`v${id}_invalid`).value);
+ if(totalRow(row)>tps[id-1][1]){
+   $(`s${id}`).textContent="Total suara melebihi DPT. Periksa angka.";
+   return;
+ }
+ row.savedAt=firebase.database.ServerValue.TIMESTAMP;
+ row.savedBy=user.uid;
+ try{
+   await db.ref("quickCount/tps/"+id).set(row);
+   $(`s${id}`).textContent="Berhasil disimpan.";
+ }catch(e){
+   $(`s${id}`).textContent="Gagal menyimpan: "+e.message;
+ }
+};
+
+try {
+ const configText=JSON.stringify(firebaseConfig);
+ if(configText.includes("ISI_")){
+   $("connection").textContent="Konfigurasi Firebase belum diisi.";
+ } else {
+   firebase.initializeApp(firebaseConfig);
+   auth=firebase.auth();
+   db=firebase.database();
+   db.ref("quickCount/tps").on("value",snap=>{
+     data=snap.val()||{};
+     render();
+     $("connection").textContent="Terhubung. Data diperbarui otomatis.";
+   },err=>{
+     $("connection").textContent="Gagal membaca database: "+err.message;
+   });
+
+   $("loginBtn").onclick=async()=>{
+     try{
+       await auth.signInWithEmailAndPassword($("email").value.trim(),$("password").value);
+       $("loginStatus").textContent="Login berhasil.";
+     }catch(e){
+       $("loginStatus").textContent="Login gagal. Periksa email dan kata sandi.";
+     }
+   };
+   $("logoutBtn").onclick=()=>auth.signOut();
+   auth.onAuthStateChanged(u=>{
+     user=u;
+     $("login").hidden=!!u;
+     $("account").hidden=!u;
+     $("entry").hidden=!u;
+     $("accountText").textContent=u?"Login sebagai "+u.email:"";
+     render();
+   });
+ }
+} catch(e) {
+ $("connection").textContent="Kesalahan konfigurasi: "+e.message;
 }
-function resetData(){
-if(!confirm("Yakin ingin menghapus semua data suara?"))return;
-data=tps.map(()=>({v:[0,0,0,0,0],tidak:0}));
-try{localStorage.removeItem("kawoQuickCount");}catch(e){}
-buatForm();hitung();
-}
-try{let lama=localStorage.getItem("kawoQuickCount");if(lama){let d=JSON.parse(lama);if(Array.isArray(d)&&d.length===18)data=d;}}catch(e){}
-buatForm();hitung();
 </script>
 </body>
 </html>
